@@ -1,0 +1,19 @@
+body {
+  font-family: sans-serif;
+  background-color: gray;
+}
+
+/* ChatGPT was used to help us find the best button alignment*/
+#three-canvas {
+  height: 0px;
+  display: block;
+}
+
+#buttons {
+  width: 100%;
+  margin: auto;
+  top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+}
