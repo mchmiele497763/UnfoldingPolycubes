@@ -249,9 +249,6 @@ class Layer {
     var queue = [face[0].northFace(face[1])];
     var index = 0;
     while (queue.length > 0) {
-      if (index > 10) {
-        return clip;
-      }
       index += 1;
       start = queue[0];
       queue.shift();
@@ -383,6 +380,7 @@ class Layer {
       return faces;
     }
     var clip = this.findclip(face);
+    clip = this.removeExcessFromclip(face, clip);
 
     for (let i = 0; i < this.cubes.length; i++) {
       // [UP, DOWN, LEFT, RIGHT, FRONT, BACK]; 0 1 2 3 4 5
@@ -399,6 +397,7 @@ class Layer {
                 faceInList(clip, this.cubes[i].up.val.southFace(face[1]))
               ) {
                 faces.push([this.cubes[i].up.val, face[1]]);
+                continue;
               }
               if (
                 this.cubes[i].up.val.adjacency[reverseIDdirections[face[1]]]
@@ -424,6 +423,7 @@ class Layer {
                 faceInList(clip, this.cubes[i].up.val.southFace(face[1]))
               ) {
                 faces.push([this.cubes[i].up.val, face[1]]);
+                continue;
               }
               if (
                 this.cubes[i].up.val.adjacency[reverseIDdirections[face[1]]]
@@ -453,6 +453,7 @@ class Layer {
                 faceInList(clip, this.cubes[i].up.val.southFace(face[1]))
               ) {
                 faces.push([this.cubes[i].up.val, face[1]]);
+                continue;
               }
               if (
                 this.cubes[i].up.val.adjacency[reverseIDdirections[face[1]]]
@@ -478,6 +479,7 @@ class Layer {
                 faceInList(clip, this.cubes[i].up.val.southFace(face[1]))
               ) {
                 faces.push([this.cubes[i].up.val, face[1]]);
+                continue;
               }
               if (
                 this.cubes[i].up.val.adjacency[reverseIDdirections[face[1]]]
@@ -507,6 +509,7 @@ class Layer {
                 faceInList(clip, this.cubes[i].up.val.southFace(face[1]))
               ) {
                 faces.push([this.cubes[i].up.val, face[1]]);
+                continue;
               }
               if (
                 this.cubes[i].up.val.adjacency[reverseIDdirections[face[1]]]
@@ -532,6 +535,7 @@ class Layer {
                 faceInList(clip, this.cubes[i].up.val.southFace(face[1]))
               ) {
                 faces.push([this.cubes[i].up.val, face[1]]);
+                continue;
               }
               if (
                 this.cubes[i].up.val.adjacency[reverseIDdirections[face[1]]]
@@ -562,6 +566,7 @@ class Layer {
                 faceInList(clip, this.cubes[i].up.val.southFace(face[1]))
               ) {
                 faces.push([this.cubes[i].up.val, face[1]]);
+                continue;
               }
               if (
                 this.cubes[i].up.val.adjacency[reverseIDdirections[face[1]]]
@@ -587,6 +592,7 @@ class Layer {
                 faceInList(clip, this.cubes[i].up.val.southFace(face[1]))
               ) {
                 faces.push([this.cubes[i].up.val, face[1]]);
+                continue;
               }
               if (
                 this.cubes[i].up.val.adjacency[reverseIDdirections[face[1]]]
@@ -730,32 +736,38 @@ class Layer {
 
 var color = "blue";
 
-class Unfolded {
-  constructor(x, y) {
-    this.faces = [];
-    this.x = x;
-    this.y = y;
-  }
+class check_connexity {
+  constructor(polycube) {
+    this.cube_list = [];
+    this.isConnex = false;
+    if (polycube.cubes.length > 0) {
+      var initial_cube = polycube.cubes[0];
+      this.cube_list.push(initial_cube);
+      var connex = this.depth_search(initial_cube, null);
+      this.isConnex = connex;
+    }
 
-  createUnfoldFromMatrix(matrix) {
-    for (let i = 0; i < matrix.length; i++) {
-      for (let j = 0; j < matrix[i].length; j++) {
-        if (matrix[i][j] == 1) {
-          this.addFace(this.x + j, this.y + i, 0);
-        }
-      }
+    if (this.cube_list.length != polycube.cubes.length) {
+      this.isConnex = false;
     }
   }
 
-  addFace(x, y, z) {
-    const material1 = new THREE.MeshPhongMaterial({
-      color: color,
-    });
-    var face = new THREE.Mesh(geometryFace, material1);
-    face.position.set(x, y, z);
-
-    this.faces.push(face);
-    scene.add(face);
+  depth_search(cube, parent) {
+    for (let i = 0; i < 6; i++) {
+      let adjacent = cube.adjacency[i].val;
+      if (adjacent != null) {
+        if (adjacent == parent) {
+        } else if (this.cube_list.includes(adjacent)) {
+        } else {
+          this.cube_list.push(adjacent);
+          let connex = this.depth_search(adjacent, cube);
+          if (!connex) {
+            return connex;
+          }
+        }
+      }
+    }
+    return true;
   }
 }
 
@@ -770,8 +782,14 @@ class convexity {
     this.connect_x = {};
     this.connect_y = {};
     this.connect_z = {};
-    this.compute_planes();
-    this.convex = this.compute_convexity();
+    this.connex = new check_connexity(this.polycube);
+    if (this.connex.isConnex) {
+      this.compute_planes();
+      this.convex = this.compute_convexity();
+    } else {
+      console.log("Polycube is not connex");
+      this.convex = false;
+    }
   }
 
   compute_planes() {
@@ -1112,7 +1130,24 @@ function horizontalMatrix(topfaces) {
   }
   return matrix;
 }
+function transpose_Matrix(Matrix) {
+  var newMatrix = [];
 
+  for (let i = 0; i < Matrix[0].length; i++) {
+    var line = [];
+    for (let j = 0; j < Matrix.length; j++) {
+      line.push(0);
+    }
+    newMatrix.push(line);
+  }
+  for (let i = 0; i < Matrix[0].length; i++) {
+    for (let j = 0; j < Matrix.length; j++) {
+      newMatrix[i][j] = Matrix[j][i];
+    }
+  }
+
+  return newMatrix;
+}
 function transformBridgeToMatrix(layer, Li) {
   var bridge = layer.bridge;
   var face = layer.R;
@@ -1123,6 +1158,7 @@ function transformBridgeToMatrix(layer, Li) {
   var minz = 100000000;
   var maxx = -1000000000;
   var maxz = -1000000000;
+
   for (let i = 0; i < bridge.length; i++) {
     minx = Math.min(bridge[i][0].cube.position.x, minx);
     minz = Math.min(bridge[i][0].cube.position.z, minz);
@@ -1140,7 +1176,9 @@ function transformBridgeToMatrix(layer, Li) {
     }
     Matrix.push(line);
   }
-
+  if (face[1] == 2 || face[1] == 3) {
+    Matrix = transpose_Matrix(Matrix);
+  }
   for (let i = 0; i < bridge.length; i++) {
     if (!layer.clockwise) {
       if (bridge[i][1] == 1) {
@@ -1165,13 +1203,31 @@ function transformBridgeToMatrix(layer, Li) {
         Matrix[maxx - minx - (bridge[i][0].cube.position.x - minx)][
           maxz - minz - (bridge[i][0].cube.position.z - minz)
         ] = 1;
+
         if (faceEqual(bridge[i], face[0].northFace(face[1]))) {
+          console.log(bridge[i][0].cube.position.x - minx);
+          if (Li[1] == face[1]) {
+            startPoint = [
+              bridge[i][0].cube.position.x - minx,
+              maxz - minz - (bridge[i][0].cube.position.z - minz),
+            ];
+            console.log(startPoint);
+            continue;
+          }
           startPoint = [
             maxx - minx - (bridge[i][0].cube.position.x - minx),
             maxz - minz - (bridge[i][0].cube.position.z - minz),
           ];
         }
         if (faceEqual(bridge[i], Li[0].southFace(Li[1]))) {
+          if (Li[1] == face[1]) {
+            console.log(bridge[i][0].cube.position.x - minx);
+            endpoint = [
+              bridge[i][0].cube.position.x - minx + 1,
+              maxz - minz - (bridge[i][0].cube.position.z - minz),
+            ];
+            continue;
+          }
           endpoint = [
             maxx - minx - (bridge[i][0].cube.position.x - minx) - 1,
             maxz - minz - (bridge[i][0].cube.position.z - minz),
@@ -1213,6 +1269,25 @@ function transformBridgeToMatrix(layer, Li) {
         }
         continue;
       }
+      if (face[1] == 2 || face[1] == 3) {
+        Matrix[maxx - minx - (bridge[i][0].cube.position.x - minx)][
+          maxz - minz - (bridge[i][0].cube.position.z - minz)
+        ] = 1;
+
+        if (faceEqual(bridge[i], face[0].northFace(face[1]))) {
+          startPoint = [
+            maxx - minx - (bridge[i][0].cube.position.x - minx) + 2,
+            maxz - minz - (bridge[i][0].cube.position.z - minz),
+          ];
+        }
+        if (faceEqual(bridge[i], Li[0].southFace(Li[1]))) {
+          endpoint = [
+            maxx - minx - (bridge[i][0].cube.position.x - minx) + 1,
+            maxz - minz - (bridge[i][0].cube.position.z - minz),
+          ];
+        }
+        continue;
+      }
 
       Matrix[maxx - minx - (bridge[i][0].cube.position.x - minx)][
         maxz - minz - (bridge[i][0].cube.position.z - minz)
@@ -1231,6 +1306,7 @@ function transformBridgeToMatrix(layer, Li) {
       }
     }
   }
+  console.log([Matrix, startPoint, endpoint]);
   return [Matrix, startPoint, endpoint];
 }
 
@@ -1321,6 +1397,7 @@ function creatingUnfold() {
     var bridgeMatrix = transformBridgeToMatrix(polycube.layers[i], nextLi)[0];
     newx -= transformBridgeToMatrix(polycube.layers[i], nextLi)[1][1];
     newy -= transformBridgeToMatrix(polycube.layers[i], nextLi)[1][0];
+
     color = "orange";
     var unfold2 = new Unfolded(newx, newy);
     unfold2.createUnfoldFromMatrix(bridgeMatrix);

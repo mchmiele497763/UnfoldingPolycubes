@@ -4,9 +4,13 @@ class check_poly_tree {
     this.isTree = false;
     if (polycube.cubes.length > 0) {
       var initial_cube = polycube.cubes[0];
-      this.cube_list.push(initial_cube, null);
-      var tree = this.depth_search(initial_cube);
+      this.cube_list.push(initial_cube);
+      var tree = this.depth_search(initial_cube, null);
       this.isTree = tree;
+    }
+
+    if (this.cube_list.length != polycube.cubes.length) {
+      this.isTree = false;
     }
   }
 
@@ -207,15 +211,22 @@ function unfoldPolycubeTree() {
     console.log("This polycube is not a tree");
     return;
   }
+  resetScene();
   unfoldedFaces = [];
   var root = null;
   for (let i in polycube.cubes) {
     if (polycube.cubes[i].degree == 0) {
       // if there is only 1 cube
-      unfoldedFaces.push("F0");
-      unfoldedFaces.push(["T0", "R0"]);
-      unfoldedFaces.push("K0");
-      unfoldedFaces.push(["B0", "L0"]);
+      unfoldedFaces.push("F" + polycube.cubes[i].id);
+      unfoldedFaces.push([
+        "T" + polycube.cubes[i].id,
+        "R" + polycube.cubes[i].id,
+      ]);
+      unfoldedFaces.push("K" + polycube.cubes[i].id);
+      unfoldedFaces.push([
+        "B" + polycube.cubes[i].id,
+        "L" + polycube.cubes[i].id,
+      ]);
       break;
     }
     if (polycube.cubes[i].degree == 1) {

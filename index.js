@@ -21,6 +21,8 @@ const ADJACENCY = [
 const IDdirections = [0, 1, 2, 3, 4, 5];
 const reverseIDdirections = [1, 0, 3, 2, 5, 4];
 
+var button_clicked = false;
+
 const scene = new THREE.Scene();
 
 const geometryFace = new THREE.PlaneGeometry(1, 1);
@@ -69,11 +71,22 @@ function cubeInList(List, cube) {
   return false;
 }
 function mousePressed() {
-  if (selectedCube != null) {
+  if (button_clicked) {
+    button_clicked = false;
+  } else if (selectedCube != null) {
     var position = selectedCube.object.position.clone();
     var normal = selectedCube.normal;
     position.add(normal);
     polycube.addcube(position.x, position.y, position.z);
+  }
+}
+function rightclick() {
+  if (button_clicked) {
+    button_clicked = false;
+  } else if (selectedCube != null) {
+    var index = scene.children.indexOf(selectedCube.object);
+    scene.children.splice(index, 1);
+    polycube.removecube(selectedCube.object);
   }
 }
 
@@ -231,10 +244,35 @@ class Polycube {
   }
 
   addcube(x, y, z) {
-    var cube = new Cube(x, y, z, this, this.cubes.length);
+    var cube = new Cube(
+      x,
+      y,
+      z,
+      this,
+      x.toString() + "-" + y.toString() + "-" + z.toString()
+    );
     this.cubes.push(cube);
 
     scene.add(cube.cube);
+  }
+
+  removecube(cube_mesh) {
+    var cube;
+    for (let i = 0; i < this.cubes.length; i++) {
+      if (this.cubes[i].cube === cube_mesh) {
+        cube = this.cubes[i];
+        var cube_index = i;
+      }
+    }
+
+    for (let i = 0; i < 6; i++) {
+      if (cube.adjacency[i].val) {
+        cube.adjacency[i].val.adjacency[reverseIDdirections[i]].val = null;
+        cube.adjacency[i].val.degree -= 1;
+      }
+    }
+
+    this.cubes.splice(cube_index, 1);
   }
 
   computeLayers() {
@@ -493,6 +531,35 @@ class Polycube {
   }
 }
 
+class Unfolded {
+  constructor(x, y) {
+    this.faces = [];
+    this.x = x;
+    this.y = y;
+  }
+
+  createUnfoldFromMatrix(matrix) {
+    for (let i = 0; i < matrix.length; i++) {
+      for (let j = 0; j < matrix[i].length; j++) {
+        if (matrix[i][j] == 1) {
+          this.addFace(this.x + j, this.y + i, 0);
+        }
+      }
+    }
+  }
+
+  addFace(x, y, z) {
+    const material1 = new THREE.MeshPhongMaterial({
+      color: color,
+    });
+    var face = new THREE.Mesh(geometryFace, material1);
+    face.position.set(x, y, z);
+
+    this.faces.push(face);
+    scene.add(face);
+  }
+}
+
 //raycasting
 var raycaster = new THREE.Raycaster();
 var pointer = new THREE.Vector2();
@@ -521,7 +588,7 @@ function render() {
   const intersects = raycaster.intersectObjects(scene.children);
 
   while (intersects.length > 0) {
-    if (intersects[0].object instanceof THREE.Mesh) {
+    if (intersects[0].object.geometry.type == "BoxGeometry") {
       break;
     } else {
       intersects.shift();
@@ -552,6 +619,7 @@ controls.enableZoom = true;
 requestAnimationFrame(render);
 window.addEventListener("pointermove", onPointerMove);
 window.addEventListener("click", mousePressed);
+window.addEventListener("contextmenu", rightclick);
 
 var polycube = new Polycube();
 const axesHelper = new THREE.AxesHelper(5);
@@ -602,32 +670,35 @@ function resetScene() {
 }
 
 function buttonclicked() {
+  button_clicked = true;
   if (polycube.cubes.length <= 0) {
     return;
   }
-  resetScene();
   var x = new convexity(polycube);
   if (x.convex) {
+    //resetScene();
     polycube.computeUnfold();
     unfolds = creatingUnfold();
-    polycube.clearPolycube();
+    //polycube.clearPolycube();
   } else {
     console.log("Should have been convex!");
   }
 }
 
 function button2clicked() {
-  resetScene();
+  button_clicked = true;
   unfoldPolycubeTree();
 }
 
 function button3clicked() {
+  button_clicked = true;
   polycube.clearPolycube();
   resetScene();
   polycube.addcube(0, 0, 0);
 }
 
 function button4clicked() {
+  button_clicked = true;
   polycube.clearPolycube();
   resetScene();
   polycube.addcube(10, 0, 13);

@@ -24,14 +24,26 @@
     </div>
 
     <div id="report">
-      <h1>Autors:</h1>
+      <h1>Polycube unfolding</h1>
+      <p>
+        The purpose of this project is to work with different methods to unfold
+        polycubes. The polycube is a 3-dimensional geometrical figure created
+        with cubes next to each other. The unfolding that we worked on consist
+        of dividing the 3D figure on its edges (and faces in polycube tree) into
+        2D faces to flatten the figure to 2-dimensions. We worked with 2
+        different unfolding methods, each working for a specific shape of
+        polycubes. The question if any polycube can be unfolded by cutting the
+        edges is still an open question [O’R19], this is why we focused only on
+        unfolding Convexe polycube [DM24] and Polycube trees [DF21].
+      </p>
+      <h2>Autors:</h2>
       <p0> CHMIELEWSKI Marek, VAN DEN BREMT Mathieu, VAN HERP Mathieu </p0>
-      <h3>Convex polycube unfolding</h3>
+      <h3>Convex polycube unfolding (Mathieu Van Den Bremt)</h3>
       <p1>
-        Edge-Unfolding Polycubes with Orthogonally Convex Layers. The paper [2]
-        describes a 4 step algorithm to unfold any polycube if it has
+        Edge-Unfolding Polycubes with Orthogonally Convex Layers. The paper
+        [DM24] describes a 4 step algorithm to unfold any polycube if it has
         orthogonally convex layers. The verification of the convexity of the
-        layers is done in section???.<br />
+        layers is done in a following section.<br />
         <br />
         The main idea is to use the concepts of bridges, bands and clockwise or
         counter clockwise pointers. But in order to do that we first had to find
@@ -42,46 +54,47 @@
         layer, a R (called Ri for the ith layer), a L (called Li for the ith
         layer) and a i band (connection between the Ri and Li for the ith
         layer). <br />
-        Thus the first part of the program we did travels through the layers of
+        Thus in the first part of the program we travel through the layers of
         the polycube that have been previously found. This part follows the
-        rules from the paper [2] to find every Ri, Li and bridge. The bands can
-        be found latter because they only are the set of face between Ri and Li.
-        The pointers are also found in this part because they depend of the
+        rules from the paper [DM24] to find every Ri, Li and bridge. The bands
+        can be found later because they are the only set of faces between Ri and
+        Li. The pointers are also found in this part because they depend on the
         normals of Ri and Li+1. <br />
-        It was not easy to accomplish because the paper [2] tend to take some
-        parts of the structure has evidences which of course are much more
+        It was not easy to accomplish because the paper [DM24] tend to take some
+        parts of the structure as evident which of course are much more
         difficult to find in code. The first part of our program's complexity
-        varies a lot depending of cases. But in general most face can only be
-        verified once, to see in what part of the structure they are. But quite
-        often the verification can visited a great number of the other faces.
-        Thus we estimate the complexity as <b>O(n<sup>2</sup>)</b> where n is
-        the number of faces. In the paper [2] it is unclear what complexity they
-        would need because they seem to just "know" every part of the structure.
-        <br /><br />
+        varies a lot depending of cases, in general, most faces can only be
+        verified once to see in what part of the structure they are. However
+        quite often the verification could visite a great number of the other
+        faces. Thus we estimate the complexity as <b>O(n<sup>2</sup>)</b> where
+        n is the number of faces. In the paper [DM24] it is unclear what
+        complexity they would need because they seem to just "know" every part
+        of the structure. <br /><br />
         <h4>The unfolding itself</h4>
-        This is where the unfolding is done. With all the structure found, it is
-        possible to do the unfolding. The unfolding can be explains as :
+        This is where the unfolding is done. With all of the structure found, it
+        is now possible to do the unfolding. The unfolding can be explains as :
         <ul>
           <li>Unfold bands and bridges</li>
           <li>Unfold top layer and lateral faces not part of a band</li>
-          <li>Unfold bottom faces \item Unfold remaining edge cases</li>
+          <li>Unfold bottom faces</li>
+          <li>Unfold remaining edge cases</li>
         </ul>
-        Once again, it is easier said than done in code. Our program thus
+        Once again, it is easier said than done to code. Our program thus
         followed as much as possible the 4 steps in order, but some parts of
         certain steps where mixed to make it easier to code. The final results
-        of the unfolding looks very similar to what it should. The minor changes
-        do not affect the good unfolding of the polycube. To prove it we tested
-        on a reproduction of the polycube the paper [2] uses as an example. The
-        unfolding looks very similar. <br />
-        The complexity of the second part should be of <b>O(n)</b> with n the
-        number of outside faces. But looking at it with a more programming
-        aspect, we estimated closer to <b>O(n<sup>2</sup>)</b> once again.
-        <br /><br />
+        of the unfolding looks very similar to what it should be. The minor
+        changes do not affect the good unfolding of the polycube. To prove it we
+        tested on a reproduction of the polycube the paper [DM24] uses as an
+        example. The unfolding looks very similar. <br />
+        The complexity of the second part should be of <b>O(n)</b> with
+        <i>n</i> the number of outside faces. But looking at it with a more
+        programming aspect, we estimated closer to <b>O(n<sup>2</sup>)</b> once
+        again. <br /><br />
         <h4>Results</h4>
         In the end, the algorithm does work and we estimate a total complexity
         of this unfolding to <b>O(n<sup>2</sup>)</b>
       </p1>
-      <h3>Convexity of a polycube</h3>
+      <h3>Convexity of a polycube (Mathieu Van Herp)</h3>
       <p1>
         A layer is convex if two rules are met: that all the cubes contained in
         that layer are connected and that any two cubes sharing a coordinate
@@ -89,16 +102,18 @@
         between them. The first rule ensure that no two island of cubes can
         exist by insuring stair shaped paths and the second one ensure that no
         holes are allowed inside the layer.<br /><br />
-        To check the first rule, we need 3 dictionary, one for each axis plane.
-        Where the key is the value of the given axis and the value contain 4
-        variable used to store the min and max value found for the other axis
-        and two list containing respectively the first and second coordinates of
-        the cube's adjacency in that plane with no repetitions. <br />
+        To check the first rule, we first do a breadth first search to check
+        that the entire polycube is connexted, then we need 3 dictionary, one
+        for each axis plane. Where the key is the value of the given axis and
+        the value contain 4 variable used to store the min and max value found
+        for the other axis and two list containing respectively the first and
+        second coordinates of the cube's adjacency in that plane with no
+        repetitions. <br />
         The cube's adjacency is represented by the coordinate of the cube +/-
         0.5 in the direction of the adjacent cube. <br />
         For example if two cubes exists on the same plane X = 2 and that they
         both share the same Z coordinates the dictionary would contain {2 :
-        [cube1.y - 0.5, cube2.y + 0.5],[cube.z +0.5 ] } if cube 1 had a cube
+        [cube1.y - 0.5, cube2.y + 0.5],[cube.z + 0.5] } if cube 1 had a cube
         adjacent to it's bottom face, that cube2 had a cube adjacent to it's top
         face and that both of them had a cube adjacent to their front faces.<br />
         Theses will allow us to check if a plane contains a stair shape path
@@ -114,7 +129,7 @@
         we have the dictionary {"yz" : [cube1.x, cube2.x]}. <br /><br />
         Having structured the dictionary has such, we only have to check for
         each key of each dictionary if the following equality holds for each
-        value list (two in the cases of the planes) : MaxValue - MinValue ==
+        value list (two in the cases of the planes) : MaxValue - MinValue =
         list.length. <br />
         If the equality holds it mean that there exist a cube in every space
         between the two cubes in a planar manner (diagonal included) or in a
@@ -131,7 +146,10 @@
         equality for the 2 list giving us a complexity of <b>O(n)</b>.
       </p1>
 
-      <h3>Unfolding polycube tree with constant refinement [1]</h3>
+      <h3>
+        Unfolding polycube tree with constant refinement [DF21] (Marek
+        Chmielewski)
+      </h3>
       <h4>Introduction</h4>
       <p>
         In this section, we present the second article that we analyzed. It was
@@ -144,12 +162,15 @@
         edges for any 2 adjacent cubes, adjacent means that they share a face
         between them.
         <br />
-        The graph created by such construction must be a tree.
+        The graph created by such construction must be a tree.<br />
+        Trivialy checked by using a breadth first search, checking that no two
+        cube can appear twice in the execution and that all cubes are considered
+        implying no islands (Mathieu Van Herp).
       </p>
       <p>
         The most general unfoldings unfold only along edges as in the first
-        article [2]. In this case however, we unfold on edges and occasionally
-        also on faces of a cube. <br />
+        article [DM24]. In this case however, we unfold on edges and
+        occasionally also on faces of a cube. <br />
         A refinement means that any face can be further divided into a
         <i>[a * b]</i>
         orthogonal grid for <i> a </i> and <i> b </i> being integers bigger than
@@ -159,13 +180,14 @@
         them.
       </p>
       <p>
-        In this article [1], we talk about constant refinement. We do so because
-        the first results in this domain required an exponential refinement
-        among the grid space. Each new algorithm tried to reduce the maximum
-        refinement until reaching a linear refinement. <br />
+        In this article [DF21], we talk about constant refinement. We do so
+        because the first results in this domain required an exponential
+        refinement among the grid space [DFO06]. Each new algorithm tried to
+        reduce the maximum refinement until reaching a linear refinement [CY15].
+        <br />
         Algorithms requiring a sublinear refinement exist only for specialized
-        orthogonal classes, such as polycubes. This article [1], shows the first
-        constant refinement algorithm for polycube trees.
+        orthogonal classes, such as polycubes. This article [DF21], shows the
+        first constant refinement algorithm for polycube trees.
       </p>
       <h4>Algorithm</h4>
       <p>
@@ -200,9 +222,9 @@
         it.
       </p>
       <p>
-        The proof that the unfolding path works is proved in the article [1]. It
-        uses 3 unfolding invariants to prove that those specific path will hold
-        and give a valid unfolding. All cubes besides the root must satisfy
+        The proof that the unfolding path works is proved in the article [DF21].
+        It uses 3 unfolding invariants to prove that those specific path will
+        hold and give a valid unfolding. All cubes besides the root must satisfy
         these invariants to ensure that the unfolding is indeed possible and
         correct.
       </p>
@@ -219,16 +241,19 @@
       </p>
       <p>
         In our implementation, the unfolding also works recursively and we check
-        every cube only once so the complexity of the unfolding is <b>O(n)</b> with 
-	<i> n </i> being the number of cubes in the polycube. <br />
-        For the plotting part we used a dictionary to keep in track how many times a
-        face occured in the list. The construction of this dictionary costs
+        every cube only once so the complexity of the unfolding is
+        <b>O(n)</b> with <i> n </i> being the number of cubes in the polycube.
+        <br />
+        For the plotting part we used a dictionary to keep in track how many
+        times a face occured in the list. The construction of this dictionary
+        costs
         <b>O(m)</b> with <i>m</i> being the number of faces in the face list.
         Then, when the dictionary exists and contains a value for every face we
         can iterate the elements of the face list and plot the corresponding
         face according to its position. This also takes <b>O(m)</b>, so the
-        total time complexity of plotting is of <b>O(2m)</b>, which is still linear.
-	<br />
+        total time complexity of plotting is of <b>O(2m)</b>, which is still
+        linear.
+        <br />
       </p>
       <p>
         Note that <i> m > n </i> so the overall complexity of the whole code is
@@ -236,13 +261,39 @@
       </p>
 
       <h2>References</h2>
-      [1] Mirela Damian and Robin Flatland. “Unfolding polycube trees with
+      [DF21] Mirela Damian and Robin Flatland. “Unfolding polycube trees with
       constant refinement”. In: arXiv preprint arXiv:1811.01842 (2021). <br />
-      [2] Mirela Damian and Henk Meijer. “Edge-Unfolding Polycubes with
+      [DM24] Mirela Damian and Henk Meijer. “Edge-Unfolding Polycubes with
       Orthogonally Convex Layers”. In: arXiv preprint arXiv:2407.01326
       (2024).<br />
-      [3] Joseph O’Rourke. “Unfolding polyhedra”. In: arXiv preprint
-      arXiv:1908.07152 (2019).
+      [O’R19] Joseph O’Rourke. “Unfolding polyhedra”. In: arXiv preprint
+      arXiv:1908.07152 (2019). <br />
+      [DFO06] Mirela Damian, Robin Flatland, Joseph O'Rourke. “Epsilon-Unfolding
+      Orthogonal Polyhedra”. In: arXiv preprint arXiv:cs:0602095 (2006) <br />
+      [CY15] Yi-Jun Chang and Hsu-Chun Yen. Unfolding orthogonal polyhedra with
+      linear refinement. In Proceedings of the 26th International Symposium on
+      Algorithms and Computation, ISAAC 2015, Nagoya, Japan, pages 415–425.
+      Springer Berlin Heidelberg, 2015.
+
+      <h2>Links</h2>
+      <p>
+        Public webpage : <br />
+        <a
+          target="_blank"
+          href="https://mchmiele497763.github.io/UnfoldingPolycubes/"
+        >
+          https://mchmiele497763.github.io/UnfoldingPolycubes/</a
+        >
+      </p>
+      <p>
+        GitHub repository : <br />
+        <a
+          target="_blank"
+          href="https://github.com/mchmiele497763/UnfoldingPolycubes"
+        >
+          https://github.com/mchmiele497763/UnfoldingPolycubes</a
+        >
+      </p>
     </div>
   </body>
 </html>
