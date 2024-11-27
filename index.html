@@ -53,7 +53,9 @@
         divided by layers, every layer has a bridge that connects to the next
         layer, a R (called Ri for the ith layer), a L (called Li for the ith
         layer) and a i band (connection between the Ri and Li for the ith
-        layer). <br />
+        layer). R and L are the leftmost and rightmost cell of a band, but have
+        to be found before the band (see how to find them in paper [DM24])
+        <br />
         Thus in the first part of the program we travel through the layers of
         the polycube that have been previously found. This part follows the
         rules from the paper [DM24] to find every Ri, Li and bridge. The bands
@@ -266,8 +268,10 @@
       [DM24] Mirela Damian and Henk Meijer. “Edge-Unfolding Polycubes with
       Orthogonally Convex Layers”. In: arXiv preprint arXiv:2407.01326
       (2024).<br />
-      [O’R19] Joseph O’Rourke. “Unfolding polyhedra”. In: arXiv preprint
-      arXiv:1908.07152 (2019). <br />
+      [O’R19] Joseph O’Rourke. “Unfolding polyhedra” (2019). In "Proceedings of
+      the 31st Canadian Conference on Computational Geometry (CCCG 2019)" p
+      85-86 .
+      <br />
       [DFO06] Mirela Damian, Robin Flatland, Joseph O'Rourke. “Epsilon-Unfolding
       Orthogonal Polyhedra”. In: arXiv preprint arXiv:cs:0602095 (2006) <br />
       [CY15] Yi-Jun Chang and Hsu-Chun Yen. Unfolding orthogonal polyhedra with

@@ -42,6 +42,7 @@ class plotUnfolding {
     this.x = 0;
     this.y = 0;
     this.z = 0;
+    this.previous = null;
   }
 
   constructDict() {
@@ -69,22 +70,34 @@ class plotUnfolding {
         for (let j in this.faces[i]) {
           if (this.faces[i][j][0] == "L") {
             this.plotFace(this.faces[i][j], "left");
+            this.previous = "left";
           } else if (this.faces[i][j][0] == "R") {
             this.plotFace(this.faces[i][j], "right");
+            this.previous = "right";
           } else {
             this.plotFace(this.faces[i][j], null);
+            this.previous = "normal";
           }
         }
       } else {
         if (this.dict[this.faces[i]] == 1) {
           this.y += 1;
           this.plotFace(this.faces[i], null);
+          this.previous = "normal";
         } else if (this.dict[this.faces[i]] == 2) {
+          if (this.previous == "right") {
+            this.x += 1;
+          }
           this.plotHalfFace(this.faces[i], null);
           this.x += 1;
+          this.previous = "half";
         } else {
+          if (this.previous == "right") {
+            this.x += 1;
+          }
           this.plotQuarterFace(this.faces[i], null);
           this.x += 1;
+          this.previous = "quarter";
         }
       }
     }
@@ -111,7 +124,7 @@ class plotUnfolding {
 
   plotFace(face, direction) {
     const material1 = new THREE.MeshPhongMaterial({
-      color: "blue",
+      color: 0x888888,
     });
     var face = new THREE.Mesh(geometryFace, material1);
     if (direction == "right") {
@@ -126,7 +139,7 @@ class plotUnfolding {
 
   plotHalfFace(face) {
     const material2 = new THREE.MeshPhongMaterial({
-      color: "blue",
+      color: 0x0000ee,
     });
     var face = new THREE.Mesh(halfFace, material2);
     face.position.set(this.x + 1, this.y + 0.25, this.z);
@@ -135,7 +148,7 @@ class plotUnfolding {
 
   plotQuarterFace(face) {
     const material3 = new THREE.MeshPhongMaterial({
-      color: "blue",
+      color: 0xee0000,
     });
     var face = new THREE.Mesh(quarterFace, material3);
     face.position.set(this.x + 1, this.y + 0.375, this.z);

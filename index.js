@@ -616,6 +616,11 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.25;
 controls.enableZoom = true;
 
+var camToSave = {};
+camToSave.position = camera.position.clone();
+camToSave.rotation = camera.rotation.clone();
+camToSave.controlCenter = controls.target.clone();
+
 requestAnimationFrame(render);
 window.addEventListener("pointermove", onPointerMove);
 window.addEventListener("click", mousePressed);
@@ -676,10 +681,10 @@ function buttonclicked() {
   }
   var x = new convexity(polycube);
   if (x.convex) {
-    //resetScene();
+    resetScene();
     polycube.computeUnfold();
     unfolds = creatingUnfold();
-    //polycube.clearPolycube();
+    polycube.clearPolycube();
   } else {
     console.log("Should have been convex!");
   }

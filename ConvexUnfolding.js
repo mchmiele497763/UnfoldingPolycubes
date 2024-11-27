@@ -734,7 +734,7 @@ class Layer {
   }
 }
 
-var color = "blue";
+var color = "grey";
 
 class check_connexity {
   constructor(polycube) {
@@ -1212,16 +1212,15 @@ function transformBridgeToMatrix(layer, Li) {
               maxz - minz - (bridge[i][0].cube.position.z - minz),
             ];
             console.log(startPoint);
-            continue;
+          } else {
+            startPoint = [
+              maxx - minx - (bridge[i][0].cube.position.x - minx),
+              maxz - minz - (bridge[i][0].cube.position.z - minz),
+            ];
           }
-          startPoint = [
-            maxx - minx - (bridge[i][0].cube.position.x - minx),
-            maxz - minz - (bridge[i][0].cube.position.z - minz),
-          ];
         }
         if (faceEqual(bridge[i], Li[0].southFace(Li[1]))) {
           if (Li[1] == face[1]) {
-            console.log(bridge[i][0].cube.position.x - minx);
             endpoint = [
               bridge[i][0].cube.position.x - minx + 1,
               maxz - minz - (bridge[i][0].cube.position.z - minz),
@@ -1245,6 +1244,13 @@ function transformBridgeToMatrix(layer, Li) {
         ];
       }
       if (faceEqual(bridge[i], Li[0].southFace(Li[1]))) {
+        if (Li[1] == face[1]) {
+          endpoint = [
+            bridge[i][0].cube.position.z - minz + 1,
+            maxx - minx - (bridge[i][0].cube.position.x - minx),
+          ];
+          continue;
+        }
         endpoint = [
           maxz - minz - (bridge[i][0].cube.position.z - minz) + 1,
           maxx - minx - (bridge[i][0].cube.position.x - minx),
@@ -1341,16 +1347,20 @@ function creatingUnfold() {
 
     unfolds.push(unfold);
     var line = [];
-    line.push(1);
+    color = "blue";
 
+    var unfold = new Unfolded(newx, newy);
+    unfold.createUnfoldFromMatrix([[1]]);
+
+    newx += 1;
+    color = "green";
     for (let j = 0; j < polycube.layers[i].band.length; j++) {
       polycube.layers[i].band[j][0].cube.geometry.groups[
         FACE_TRAD[polycube.layers[i].band[j][1]]
       ].materialIndex = 3;
-      line.push(1);
 
       var unfold = new Unfolded(newx + 1 + j, newy + 1);
-
+      color = "grey";
       unfold.createUnfoldFromMatrix(
         horizontalMatrix(
           polycube.layers[i].findTopFace(
@@ -1360,6 +1370,7 @@ function creatingUnfold() {
         )
       );
       unfolds.push(unfold);
+      line.push(1);
 
       var lowerFaces = polycube.layers[i].findLowerFaces(
         polycube.layers[i].band[j]
@@ -1373,7 +1384,6 @@ function creatingUnfold() {
       unfolds.push(unfold);
     }
 
-    line.push(1);
     matrix.push(line);
 
     color = "green";
@@ -1381,9 +1391,16 @@ function creatingUnfold() {
     unfold.createUnfoldFromMatrix(matrix);
 
     unfolds.push(unfold);
-    color = "blue";
-    newx += polycube.layers[i].band.length + 1;
+
+    color = "grey";
+    newx += polycube.layers[i].band.length;
+    color = "red";
+
+    var unfold = new Unfolded(newx, newy);
+    unfold.createUnfoldFromMatrix([[1]]);
+
     newy += 1;
+    color = "grey";
     for (let j = 0; j < polycube.layers[i].bridge.length; j++) {
       polycube.layers[i].bridge[j][0].cube.geometry.groups[
         FACE_TRAD[polycube.layers[i].bridge[j][1]]
@@ -1402,7 +1419,7 @@ function creatingUnfold() {
     var unfold2 = new Unfolded(newx, newy);
     unfold2.createUnfoldFromMatrix(bridgeMatrix);
     unfolds.push(unfold2);
-    color = "blue";
+    color = "grey";
     newy += transformBridgeToMatrix(polycube.layers[i], nextLi)[2][0];
     newx += transformBridgeToMatrix(polycube.layers[i], nextLi)[2][1];
     // Concatenate bridgematrix and band matrix
