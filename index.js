@@ -790,6 +790,11 @@ function button4clicked() {
   }
 }
 
+function button5clicked() {
+  const report = document.getElementById("report");
+  report.scrollIntoView();
+}
+
 document.getElementById("button").addEventListener("click", () => {
   buttonclicked();
 });
@@ -805,3 +810,8 @@ document.getElementById("button3").addEventListener("click", () => {
 document.getElementById("button4").addEventListener("click", () => {
   button4clicked();
 });
+
+document.getElementById("button5").addEventListener("click", () => {
+  button5clicked();
+});
+
